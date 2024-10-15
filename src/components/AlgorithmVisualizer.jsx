@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 
 const AlgorithmVisualizer = () => {
   const [array, setArray] = useState([]);
+
+  useEffect(() => {
+    generateNewArray();
+  }, []);
 
   const generateNewArray = () => {
     const newArray = generateRandomArray(50, 5, 100);
@@ -18,11 +22,16 @@ const AlgorithmVisualizer = () => {
       >
         Generate New Array
       </button>
-      <div className="mt-4">
+      <div className="mt-4 h-64 flex items-end">
         {array.map((value, index) => (
-          <span key={index} className="mr-1">
-            {value}
-          </span>
+          <div
+            key={index}
+            style={{
+              height: `${value}%`,
+              width: `${100 / array.length}%`,
+            }}
+            className="bg-blue-500 mr-px"
+          ></div>
         ))}
       </div>
     </div>
