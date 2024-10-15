@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 import { bubbleSort } from "../algorithms/bubbleSort";
+import { quickSort } from "../algorithms/quickSort";
 
 const AlgorithmVisualizer = () => {
   const [array, setArray] = useState([]);
@@ -29,9 +30,22 @@ const AlgorithmVisualizer = () => {
     setSorting(false);
   };
 
+  const runQuickSort = async () => {
+    setSorting(true);
+    const sorter = quickSort([...array]);
+    for (let step of sorter) {
+      setArray(step.array);
+      setComparing(step.comparing);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    setComparing([]);
+    setSorting(false);
+  };
   return (
     <div className="flex-1 p-4">
-      <h2 className="text-xl font-semibold mb-4">Bubble Sort Visualizer</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        Sorting Algorithm Visualizer
+      </h2>
       <div className="mb-4">
         <button
           onClick={generateNewArray}
@@ -43,9 +57,16 @@ const AlgorithmVisualizer = () => {
         <button
           onClick={runBubbleSort}
           disabled={sorting}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
         >
           Run Bubble Sort
+        </button>
+        <button
+          onClick={runQuickSort}
+          disabled={sorting}
+          className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Run Quick Sort
         </button>
       </div>
       <div className="h-64 flex items-end">
