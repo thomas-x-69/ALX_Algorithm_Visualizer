@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 import { bubbleSort } from "../algorithms/bubbleSort";
 import { quickSort } from "../algorithms/quickSort";
+import { mergeSort } from "../algorithms/mergeSort";
 
 const AlgorithmVisualizer = () => {
   const [array, setArray] = useState([]);
@@ -41,6 +42,19 @@ const AlgorithmVisualizer = () => {
     setComparing([]);
     setSorting(false);
   };
+
+  const runMergeSort = async () => {
+    setSorting(true);
+    const sorter = mergeSort([...array]);
+    for (let step of sorter) {
+      setArray(step.array);
+      setComparing(step.comparing);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    setComparing([]);
+    setSorting(false);
+  };
+
   return (
     <div className="flex-1 p-4">
       <h2 className="text-xl font-semibold mb-4">
@@ -67,6 +81,13 @@ const AlgorithmVisualizer = () => {
           className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
         >
           Run Quick Sort
+        </button>
+        <button
+          onClick={runMergeSort}
+          disabled={sorting}
+          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Run Merge Sort
         </button>
       </div>
       <div className="h-64 flex items-end">
