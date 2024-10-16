@@ -53,7 +53,7 @@ const AlgorithmVisualizer = () => {
         <button
           onClick={generateNewArray}
           disabled={sorting}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4 mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4 mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
         >
           Generate New Array
         </button>
@@ -61,7 +61,7 @@ const AlgorithmVisualizer = () => {
           value={selectedAlgorithm}
           onChange={(e) => setSelectedAlgorithm(e.target.value)}
           disabled={sorting}
-          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
         >
           <option value="bubble">Bubble Sort</option>
           <option value="quick">Quick Sort</option>
@@ -70,7 +70,7 @@ const AlgorithmVisualizer = () => {
         <button
           onClick={runSortingAlgorithm}
           disabled={sorting}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50"
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
         >
           Run{" "}
           {selectedAlgorithm.charAt(0).toUpperCase() +
@@ -78,7 +78,7 @@ const AlgorithmVisualizer = () => {
           Sort
         </button>
       </div>
-      <div className="h-64 flex items-end bg-white p-4 rounded-lg shadow-lg">
+      <div className="h-64 md:h-96 flex items-end bg-white p-4 rounded-lg shadow-lg">
         {array.map((value, index) => (
           <div
             key={index}
