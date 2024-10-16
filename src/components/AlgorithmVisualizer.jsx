@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 import { bubbleSort } from "../algorithms/bubbleSort";
 import { quickSort } from "../algorithms/quickSort";
@@ -8,6 +8,7 @@ const AlgorithmVisualizer = () => {
   const [array, setArray] = useState([]);
   const [sorting, setSorting] = useState(false);
   const [comparing, setComparing] = useState([]);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
 
   useEffect(() => {
     generateNewArray();
@@ -19,9 +20,22 @@ const AlgorithmVisualizer = () => {
     setComparing([]);
   };
 
-  const runBubbleSort = async () => {
+  const runSortingAlgorithm = async () => {
     setSorting(true);
-    const sorter = bubbleSort([...array]);
+    let sorter;
+    switch (selectedAlgorithm) {
+      case "bubble":
+        sorter = bubbleSort([...array]);
+        break;
+      case "quick":
+        sorter = quickSort([...array]);
+        break;
+      case "merge":
+        sorter = mergeSort([...array]);
+        break;
+      default:
+        sorter = bubbleSort([...array]);
+    }
     for (let step of sorter) {
       setArray(step.array);
       setComparing(step.comparing);
@@ -30,31 +44,6 @@ const AlgorithmVisualizer = () => {
     setComparing([]);
     setSorting(false);
   };
-
-  const runQuickSort = async () => {
-    setSorting(true);
-    const sorter = quickSort([...array]);
-    for (let step of sorter) {
-      setArray(step.array);
-      setComparing(step.comparing);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    setComparing([]);
-    setSorting(false);
-  };
-
-  const runMergeSort = async () => {
-    setSorting(true);
-    const sorter = mergeSort([...array]);
-    for (let step of sorter) {
-      setArray(step.array);
-      setComparing(step.comparing);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    setComparing([]);
-    setSorting(false);
-  };
-
   return (
     <div className="flex-1 p-4">
       <h2 className="text-xl font-semibold mb-4">
@@ -68,26 +57,25 @@ const AlgorithmVisualizer = () => {
         >
           Generate New Array
         </button>
-        <button
-          onClick={runBubbleSort}
+        <select
+          value={selectedAlgorithm}
+          onChange={(e) => setSelectedAlgorithm(e.target.value)}
           disabled={sorting}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-2"
         >
-          Run Bubble Sort
-        </button>
+          <option value="bubble">Bubble Sort</option>
+          <option value="quick">Quick Sort</option>
+          <option value="merge">Merge Sort</option>
+        </select>
         <button
-          onClick={runQuickSort}
+          onClick={runSortingAlgorithm}
           disabled={sorting}
-          className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
-          Run Quick Sort
-        </button>
-        <button
-          onClick={runMergeSort}
-          disabled={sorting}
-          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Run Merge Sort
+          Run{" "}
+          {selectedAlgorithm.charAt(0).toUpperCase() +
+            selectedAlgorithm.slice(1)}{" "}
+          Sort
         </button>
       </div>
       <div className="h-64 flex items-end">
