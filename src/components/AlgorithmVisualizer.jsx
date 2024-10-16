@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/components/AlgorithmVisualizer.jsx
+import React, { useState, useEffect, useRef } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 import { bubbleSort } from "../algorithms/bubbleSort";
 import { quickSort } from "../algorithms/quickSort";
@@ -9,19 +10,35 @@ const AlgorithmVisualizer = () => {
   const [sorting, setSorting] = useState(false);
   const [comparing, setComparing] = useState([]);
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
+  const [speed, setSpeed] = useState(50);
+  const [paused, setPaused] = useState(false);
+  const sorterRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     generateNewArray();
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   const generateNewArray = () => {
     const newArray = generateRandomArray(50, 5, 100);
     setArray(newArray);
     setComparing([]);
+    if (sorterRef.current) {
+      sorterRef.current = null;
+    }
+    setSorting(false);
+    setPaused(false);
   };
 
   const runSortingAlgorithm = async () => {
+    if (sorting) return;
     setSorting(true);
+    setPaused(false);
     let sorter;
     switch (selectedAlgorithm) {
       case "bubble":
@@ -36,14 +53,59 @@ const AlgorithmVisualizer = () => {
       default:
         sorter = bubbleSort([...array]);
     }
-    for (let step of sorter) {
-      setArray(step.array);
-      setComparing(step.comparing);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    setComparing([]);
-    setSorting(false);
+    sorterRef.current = sorter;
+    await runSorter();
   };
+
+  const runSorter = async () => {
+    if (!sorterRef.current) return;
+
+    const step = async () => {
+      if (paused) return;
+
+      const { value, done } = sorterRef.current.next();
+      if (done) {
+        setSorting(false);
+        setComparing([]);
+        sorterRef.current = null;
+        return;
+      }
+
+      setArray(value.array);
+      setComparing(value.comparing);
+
+      timeoutRef.current = setTimeout(step, 101 - speed);
+    };
+
+    await step();
+  };
+
+  const pauseSorting = () => {
+    setPaused(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const resumeSorting = () => {
+    setPaused(false);
+    runSorter();
+  };
+
+  const stepForward = async () => {
+    if (sorterRef.current) {
+      const { value, done } = sorterRef.current.next();
+      if (!done) {
+        setArray(value.array);
+        setComparing(value.comparing);
+      } else {
+        setSorting(false);
+        setComparing([]);
+        sorterRef.current = null;
+      }
+    }
+  };
+
   return (
     <div className="flex-1 p-4 bg-gray-100">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
@@ -52,7 +114,7 @@ const AlgorithmVisualizer = () => {
       <div className="mb-6 flex flex-wrap items-center">
         <button
           onClick={generateNewArray}
-          disabled={sorting}
+          disabled={sorting && !paused}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4 mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
         >
           Generate New Array
@@ -60,7 +122,7 @@ const AlgorithmVisualizer = () => {
         <select
           value={selectedAlgorithm}
           onChange={(e) => setSelectedAlgorithm(e.target.value)}
-          disabled={sorting}
+          disabled={sorting && !paused}
           className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
         >
           <option value="bubble">Bubble Sort</option>
@@ -69,7 +131,7 @@ const AlgorithmVisualizer = () => {
         </select>
         <button
           onClick={runSortingAlgorithm}
-          disabled={sorting}
+          disabled={sorting && !paused}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
         >
           Run{" "}
@@ -77,6 +139,45 @@ const AlgorithmVisualizer = () => {
             selectedAlgorithm.slice(1)}{" "}
           Sort
         </button>
+        <div className="flex items-center mt-4 w-full">
+          <label htmlFor="speed" className="mr-2">
+            Speed:
+          </label>
+          <input
+            type="range"
+            id="speed"
+            min="1"
+            max="100"
+            value={speed}
+            onChange={(e) => setSpeed(parseInt(e.target.value))}
+            className="w-full max-w-xs"
+          />
+        </div>
+      </div>
+      <div className="mb-4 flex space-x-2">
+        {sorting && !paused ? (
+          <button
+            onClick={pauseSorting}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Pause
+          </button>
+        ) : sorting && paused ? (
+          <button
+            onClick={resumeSorting}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Resume
+          </button>
+        ) : null}
+        {sorting && paused && (
+          <button
+            onClick={stepForward}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Step Forward
+          </button>
+        )}
       </div>
       <div className="h-64 md:h-96 flex items-end bg-white p-4 rounded-lg shadow-lg">
         {array.map((value, index) => (
