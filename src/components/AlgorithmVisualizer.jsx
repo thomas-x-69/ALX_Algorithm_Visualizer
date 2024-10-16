@@ -45,15 +45,15 @@ const AlgorithmVisualizer = () => {
     setSorting(false);
   };
   return (
-    <div className="flex-1 p-4">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="flex-1 p-4 bg-gray-100">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
         Sorting Algorithm Visualizer
       </h2>
-      <div className="mb-4">
+      <div className="mb-6 flex flex-wrap items-center">
         <button
           onClick={generateNewArray}
           disabled={sorting}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4 mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50"
         >
           Generate New Array
         </button>
@@ -61,7 +61,7 @@ const AlgorithmVisualizer = () => {
           value={selectedAlgorithm}
           onChange={(e) => setSelectedAlgorithm(e.target.value)}
           disabled={sorting}
-          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-2"
+          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="bubble">Bubble Sort</option>
           <option value="quick">Quick Sort</option>
@@ -70,7 +70,7 @@ const AlgorithmVisualizer = () => {
         <button
           onClick={runSortingAlgorithm}
           disabled={sorting}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50"
         >
           Run{" "}
           {selectedAlgorithm.charAt(0).toUpperCase() +
@@ -78,7 +78,7 @@ const AlgorithmVisualizer = () => {
           Sort
         </button>
       </div>
-      <div className="h-64 flex items-end">
+      <div className="h-64 flex items-end bg-white p-4 rounded-lg shadow-lg">
         {array.map((value, index) => (
           <div
             key={index}
@@ -86,8 +86,12 @@ const AlgorithmVisualizer = () => {
               height: `${value}%`,
               width: `${100 / array.length}%`,
             }}
-            className={`mr-px ${
-              comparing.includes(index) ? "bg-red-500" : "bg-blue-500"
+            className={`mr-px transition-all duration-300 ease-in-out ${
+              comparing.includes(index)
+                ? "bg-red-500"
+                : sorting
+                ? "bg-yellow-400"
+                : "bg-blue-500"
             }`}
           ></div>
         ))}
