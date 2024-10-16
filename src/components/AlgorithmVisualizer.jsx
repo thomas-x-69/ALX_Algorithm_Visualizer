@@ -1,4 +1,3 @@
-// src/components/AlgorithmVisualizer.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { generateRandomArray } from "../utils/arrayUtils";
 import { bubbleSort } from "../algorithms/bubbleSort";
@@ -140,7 +139,7 @@ const AlgorithmVisualizer = () => {
           Sort
         </button>
         <div className="flex items-center mt-4 w-full">
-          <label htmlFor="speed" className="mr-2">
+          <label htmlFor="speed" className="mr-2 text-gray-700 font-semibold">
             Speed:
           </label>
           <input
@@ -152,6 +151,7 @@ const AlgorithmVisualizer = () => {
             onChange={(e) => setSpeed(parseInt(e.target.value))}
             className="w-full max-w-xs"
           />
+          <span className="ml-2 text-gray-700 font-semibold">{speed}</span>
         </div>
       </div>
       <div className="mb-4 flex space-x-2">
@@ -179,22 +179,28 @@ const AlgorithmVisualizer = () => {
           </button>
         )}
       </div>
-      <div className="h-64 md:h-96 flex items-end bg-white p-4 rounded-lg shadow-lg">
+      <div className="h-64 md:h-96 flex items-end bg-white p-4 rounded-lg shadow-lg relative">
         {array.map((value, index) => (
           <div
             key={index}
-            style={{
-              height: `${value}%`,
-              width: `${100 / array.length}%`,
-            }}
-            className={`mr-px transition-all duration-300 ease-in-out ${
-              comparing.includes(index)
-                ? "bg-red-500"
-                : sorting
-                ? "bg-yellow-400"
-                : "bg-blue-500"
-            }`}
-          ></div>
+            className="flex flex-col items-center justify-end h-full"
+            style={{ width: `${100 / array.length}%` }}
+          >
+            <div
+              style={{
+                height: `${value}%`,
+                width: "100%",
+              }}
+              className={`transition-all duration-300 ease-in-out ${
+                comparing.includes(index)
+                  ? "bg-red-500"
+                  : sorting
+                  ? "bg-yellow-400"
+                  : "bg-blue-500"
+              }`}
+            ></div>
+            <span className="text-xs mt-1 text-gray-600">{value}</span>
+          </div>
         ))}
       </div>
     </div>
