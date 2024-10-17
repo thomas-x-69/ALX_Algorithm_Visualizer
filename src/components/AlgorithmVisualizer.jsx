@@ -12,25 +12,38 @@ const AlgorithmVisualizer = () => {
   const [searching, setSearching] = useState(false);
   const [comparing, setComparing] = useState([]);
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
-  const [speed, setSpeed] = useState(50);
+  const [speed, setSpeed] = useState(10);
   const [algorithmType, setAlgorithmType] = useState("sorting");
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const algorithmRef = useRef(null);
   const timeoutRef = useRef(null);
 
   useEffect(() => {
-    generateNewArray();
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("resize", handleResize);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
   }, []);
 
+  useEffect(() => {
+    generateNewArray();
+  }, [isMobile]);
+
   const generateNewArray = () => {
-    const newArray = generateRandomArray(50, 5, 100);
+    const arraySize = isMobile ? 10 : 50;
+    const newArray = generateRandomArray(arraySize, 5, 100);
     setArray(newArray);
     setComparing([]);
     if (algorithmRef.current) {
@@ -81,7 +94,6 @@ const AlgorithmVisualizer = () => {
     if (selectedAlgorithm === "linear") {
       searcher = linearSearch([...array], searchValueInt);
     } else {
-      // Check if the array is sorted for binary search
       if (!isSorted(array)) {
         setError("Array must be sorted for binary search.");
         setSearching(false);
@@ -123,7 +135,7 @@ const AlgorithmVisualizer = () => {
         setComparing(value.comparing);
       }
 
-      timeoutRef.current = setTimeout(step, 101 - speed);
+      timeoutRef.current = setTimeout(step, 120 - speed);
     };
 
     await step();
@@ -140,15 +152,15 @@ const AlgorithmVisualizer = () => {
   };
 
   return (
-    <div className="flex-1 p-4 bg-gray-100">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+    <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+      <h2 className="text-3xl sm:text-4xl font-extrabold mb-6 sm:mb-8 text-indigo-800 text-center">
         Algorithm Visualizer
       </h2>
-      <div className="mb-6 flex flex-wrap items-center">
+      <div className="mb-6 sm:mb-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
         <button
           onClick={generateNewArray}
           disabled={sorting || searching}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-4 mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         >
           Generate New Array
         </button>
@@ -161,7 +173,7 @@ const AlgorithmVisualizer = () => {
             );
           }}
           disabled={sorting || searching}
-          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+          className="bg-white text-indigo-800 border-2 border-indigo-300 rounded-lg py-2 px-4 sm:py-3 sm:px-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out text-sm sm:text-base"
         >
           <option value="sorting">Sorting</option>
           <option value="searching">Searching</option>
@@ -170,7 +182,7 @@ const AlgorithmVisualizer = () => {
           value={selectedAlgorithm}
           onChange={(e) => setSelectedAlgorithm(e.target.value)}
           disabled={sorting || searching}
-          className="bg-white border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+          className="bg-white text-indigo-800 border-2 border-indigo-300 rounded-lg py-2 px-4 sm:py-3 sm:px-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out text-sm sm:text-base"
         >
           {algorithmType === "sorting" ? (
             <>
@@ -191,70 +203,81 @@ const AlgorithmVisualizer = () => {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Enter search value"
-            className="border border-gray-300 rounded-md py-2 px-4 mr-4 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+            className="border-2 border-indigo-300 rounded-lg py-2 px-4 sm:py-3 sm:px-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300 ease-in-out text-sm sm:text-base"
           />
         )}
         <button
           onClick={runAlgorithm}
           disabled={sorting || searching}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         >
           Run Algorithm
         </button>
-        <div className="flex items-center mt-4 w-full">
-          <label htmlFor="speed" className="mr-2 text-gray-700 font-semibold">
-            Speed:
-          </label>
-          <input
-            type="range"
-            id="speed"
-            min="1"
-            max="100"
-            value={speed}
-            onChange={(e) => setSpeed(parseInt(e.target.value))}
-            className="w-full max-w-xs"
-          />
-          <span className="ml-2 text-gray-700 font-semibold">{speed}</span>
-        </div>
+      </div>
+      <div className="flex items-center justify-center mb-6 sm:mb-8">
+        <label
+          htmlFor="speed"
+          className="mr-2 sm:mr-4 text-indigo-800 font-semibold text-base sm:text-lg"
+        >
+          Speed:
+        </label>
+        <input
+          type="range"
+          id="speed"
+          min="1"
+          max="100"
+          value={speed}
+          onChange={(e) => setSpeed(parseInt(e.target.value))}
+          className="w-48 sm:w-64 accent-indigo-600"
+        />
+        <span className="ml-2 sm:ml-4 text-indigo-800 font-semibold text-base sm:text-lg">
+          {speed}
+        </span>
       </div>
       {(sorting || searching) && (
-        <div className="mb-4">
+        <div className="mb-6 sm:mb-8 flex justify-center">
           <button
             onClick={stopAlgorithm}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-sm sm:text-base"
           >
             Stop
           </button>
         </div>
       )}
-      {error && <div className="mb-4 text-red-500 font-semibold">{error}</div>}
-      <div className="h-64 md:h-96 flex items-end bg-white p-4 rounded-lg shadow-lg relative">
+      {error && (
+        <div className="mb-6 sm:mb-8 text-red-600 font-semibold text-center text-sm sm:text-base bg-red-100 py-2 px-4 rounded-lg">
+          {error}
+        </div>
+      )}
+      <div className="h-64 sm:h-96 flex items-end bg-white p-4 sm:p-8 rounded-2xl shadow-2xl relative overflow-hidden">
         {array.map((value, index) => (
           <div
             key={index}
-            className="flex flex-col items-center justify-end h-full ml-1"
+            className="flex flex-col items-center justify-end h-full"
             style={{ width: `${100 / array.length}%` }}
           >
             <div
               style={{
                 height: `${value}%`,
-                width: "100%",
+                width: isMobile ? "60%" : "80%",
               }}
-              className={`transition-all duration-300 ease-in-out ${
+              className={`transition-all duration-300 ease-in-out rounded-t-lg ${
                 comparing.includes(index)
                   ? "bg-red-500"
                   : sorting || searching
                   ? "bg-yellow-400"
-                  : "bg-blue-500"
+                  : "bg-indigo-500"
               }`}
             ></div>
-            <span className="text-xs mt-1 text-gray-600">{value}</span>
+            <span className="text-xs mt-1 sm:mt-2 text-indigo-800 font-medium">
+              {value}
+            </span>
           </div>
         ))}
       </div>
       {algorithmType === "searching" && searchResult !== null && (
-        <div className="mt-4 text-center">
-          <p className="text-lg font-semibold">
+        <div className="mt-6 sm:mt-8 text-center bg-indigo-100 py-3 px-4 sm:py-4 sm:px-6 rounded-lg shadow-md">
+          <p className="text-lg sm:text-xl font-bold text-indigo-800">
             {searchResult !== -1
               ? `Value ${searchValue} found at index ${searchResult}`
               : `Value ${searchValue} not found in the array`}
